@@ -8,3 +8,10 @@ export interface Project {
     demoLink?: string;
     githubLink?: string;
   }
+
+
+export  interface Dot {
+    x: number;
+    y: number;
+  }
+  
