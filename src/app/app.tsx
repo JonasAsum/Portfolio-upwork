@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import Navbar from '../components/navbar'; // Make sure this path is correct
+import Navbar from '../components/navbar';
 import HeroSection from '../components/hero/hero-main';
 import AboutMeSection from '@/components/about-me/about-me-main';
 import SkillsSection from '@/components/skills/skills-main';
@@ -7,6 +7,7 @@ import SvgPath from '../components/trail/svg-path';
 import ProjectsSection from '../components/projects/projects-main';
 import ContactSection from '@/components/contact/contact-main';
 import { useTrailLogic } from '../components/trail/trailFollow/use-trail-logic';
+import SeamlessBackgroundImage from './app-background';
 
 const MemoizedSvgPath = React.memo(SvgPath);
 
@@ -17,32 +18,21 @@ function App() {
 
   return (
     <div className="w-full overflow-hidden">
+      <SeamlessBackgroundImage 
+        src="https://pictureswebsite.blob.core.windows.net/images/Bg-upscaled-reduzed.jpg"
+      />
       <Navbar />
       <HeroSection />
       <div 
-        className='relative min-h-screen' // Added pt-16 for navbar spacing
+        className='relative min-h-screen'
         id='container' 
         ref={containerRef}
         style={{
           position: 'relative',
           overflow: 'hidden',
-          backgroundColor:'#1100FF',
         }}
       >
-        <div 
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: 'url("/images/1080x2560_upscaled.png")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
-            mixBlendMode: 'normal',
-            opacity: 0.8,
-          }}
-        ></div>
-        <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ position: 'relative', zIndex: 2 }}>
           <div ref={sectionRef} className='max-w-screen-xl mx-auto relative px-4 sm:px-6 lg:px-8 text-white'>
             <section id="about" className="min-h-screen"><AboutMeSection /></section>
             <section id="skills" className="min-h-screen"><SkillsSection /></section>

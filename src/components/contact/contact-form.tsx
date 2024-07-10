@@ -21,11 +21,11 @@ type ContactFormValues = z.infer<typeof schema>;
 
 interface ContactFormProps {
   onOverlayClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+  imageLoaded: boolean;
 }
 
-const ContactForm = forwardRef<HTMLDivElement, ContactFormProps>(({ onOverlayClick }, ref) => {
+const ContactForm = forwardRef<HTMLDivElement, ContactFormProps>(({ onOverlayClick, imageLoaded }, ref) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(schema),
@@ -42,15 +42,6 @@ const ContactForm = forwardRef<HTMLDivElement, ContactFormProps>(({ onOverlayCli
 
 
 
-  useEffect(() => {
-    // Preload the background image
-    const img = new Image();
-    img.src = "/images/bg-contact.jpg";
-    img.onload = () => setImageLoaded(true);
-
-    // Initialize EmailJS
-    emailjs.init(config.emailjs.publicKey);
-  }, []);
 
   useEffect(() => {
     if (!isSubmitted) {

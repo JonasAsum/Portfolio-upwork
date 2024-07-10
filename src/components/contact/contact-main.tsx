@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import ContactForm from './contact-form';
+import { preloadImage } from './image-preload-utils';
 
 interface ContactSectionProps {
   scrollPercentage: number;
@@ -11,6 +12,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({ scrollPercentage }) => 
   const starRef = useRef<HTMLDivElement>(null);
   const contactFormRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const expansionThreshold = 0.992;
   const expansionTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -31,6 +33,8 @@ const ContactSection: React.FC<ContactSectionProps> = ({ scrollPercentage }) => 
 
     handleExpansion();
 
+
+
     window.addEventListener('scroll', handleExpansion);
 
     return () => {
@@ -38,6 +42,13 @@ const ContactSection: React.FC<ContactSectionProps> = ({ scrollPercentage }) => 
       window.removeEventListener('scroll', handleExpansion);
     };
   }, [scrollPercentage, isExpanded]);
+
+
+  useEffect(() => {
+    preloadImage('/images/bg-contact.jpg')
+      .then(() => setImageLoaded(true))
+      .catch(error => console.error('Failed to preload image:', error));
+  }, []);
 
 
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -83,7 +94,11 @@ const ContactSection: React.FC<ContactSectionProps> = ({ scrollPercentage }) => 
         )}
       </div>
       {isExpanded && (
-        <ContactForm ref={overlayRef} onOverlayClick={handleOverlayClick} />
+        <ContactForm 
+          ref={overlayRef} 
+          onOverlayClick={handleOverlayClick} 
+          imageLoaded={imageLoaded}
+        />
       )}
     </div>
   );
