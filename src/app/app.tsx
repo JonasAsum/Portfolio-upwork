@@ -1,50 +1,66 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import HeroSection from '../components/hero/hero-main';
 import AboutMeSection from '@/components/about-me/about-me-main';
 import SkillsSection from '@/components/skills/skills-main';
 import SvgPath from '../components/trail/svg-path';
-import { trails } from '../components/trail/trail-config';
+import ProjectsSection from '../components/projects/projects-main';
+import ContactSection from '@/components/contact/contact-main';
+import { useTrailLogic } from '../components/trail/trailFollow/use-trail-logic';
 
-// Define the Point interface locally
-interface Point {
-  x: number;
-  y: number;
-}
+const MemoizedSvgPath = React.memo(SvgPath);
 
 function App() {
-  const [sectionSize, setSectionSize] = useState({ width: 0, height: 0 });
   const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const updateSize = () => {
-      if (sectionRef.current) {
-        const { width, height } = sectionRef.current.getBoundingClientRect();
-        setSectionSize({ width, height });
-      }
-    };
-
-    window.addEventListener('resize', updateSize);
-    updateSize();
-
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
-
-  console.log(sectionSize);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { dotElements, renderedPaths, scrollPercentage, updatePositions } = useTrailLogic(sectionRef, containerRef);
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-hidden">
       <HeroSection />
-      <div className='relative bg-blue-900'>
-        <div ref={sectionRef} className='max-w-screen-xl mx-auto relative h-screen'>
-          {/* <AboutMeSection /> */}
-          {/* <SkillsSection  /> */}
+      <div 
+        className='relative min-h-screen ' 
+        id='container' 
+        ref={containerRef}
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          backgroundColor:'#1100FF',
+        }}
+      >
+        <div 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'url("/images/1080x2560_upscaled.png")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            mixBlendMode: 'normal',
+            opacity: 0.8, // Adjust this value if needed
+          }}
+        ></div>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div ref={sectionRef} className='max-w-screen-xl mx-auto relative px-4 sm:px-6 lg:px-8 text-white'>
+            <AboutMeSection />
+            <SkillsSection  />
+            <ProjectsSection />
+            <ContactSection  scrollPercentage={scrollPercentage} />
+          </div>
           
-          {/* Example usage of SvgPath */}
-          <SvgPath
-            width={sectionSize.width}
-            height={sectionSize.height}
-            {...trails.trail1}
-          />
+          {/* SVG paths rendered outside sectionRef but inside containerRef */}
+          {renderedPaths.map((pathProps) => (
+            <MemoizedSvgPath 
+              key={pathProps.id} 
+              {...pathProps} 
+              containerRef={containerRef} 
+            />
+          ))}
+
+          {/* Rendered dots */}
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+            {dotElements}
+          </div>
         </div>
       </div>
     </div>
