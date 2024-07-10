@@ -15,21 +15,24 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
-      - name: Clear NX cache
-        run: npx nx reset
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.9.0'
+          cache: 'npm'
+
       - name: Install npm 10.8.1
         run: |
           npm install -g npm@10.8.1
           npm --version
           echo "$(npm config get prefix)/bin" >> $GITHUB_PATH
+
       - name: Verify npm version
         run: |
           npm --version
@@ -37,14 +40,28 @@ jobs:
             echo "npm version is not 10.8.1"
             exit 1
           fi
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Install and reset NX
+        run: |
+          if ! command -v nx &> /dev/null; then
+            echo "NX not found, installing..."
+            npm install -g nx
+          fi
+          nx --version
+          nx reset
+
       - name: Unset extraheader
         run: git config --global --unset-all http.https://github.com/.extraheader || true
-      - name: Set CI to false to prevent treating warnings as errors
-        run: echo "CI=false" >> $GITHUB_ENV
+
       - name: Build
-        run: npm run build
+        run: npm run build -- --verbose
+        env:
+          CI: 'false'
+          NX_SKIP_NX_CACHE: 'true'
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
