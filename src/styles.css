@@ -1,4 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* You can add global styles to this file, and also import other style files */
+
+:root {
+  --color-deepest-purple: #1a0536;
+  --color-deep-purple: #2e0954;
+  --color-medium-purple: #451177;
+  --color-purple: #5d1d9a;
+  --color-light-purple: #7630bd;
+  --color-lighter-purple: #9049db;
+  --color-pastel-purple: #ab69f6;
+  --color-lavender: #c68fff;
+  --div-section: #9049db;
+}
+
+html {
+    font-family: 'Outfit', sans-serif;
+  }
+  
+
+
+/* You can add more global styles here */
+
+

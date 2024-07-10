@@ -6,8 +6,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { projects, Project } from './hero-projects';
-import ProjectModal from '@/components/projects-modal/projects-modal';
+import { projects, Project } from '../projects/projects-list';
+import ProjectModal from '@/components/projects/projectsModal/projects-modal';
 
 const ProjectSlider: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);

@@ -1,51 +1,77 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { getPathD } from './trail-utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { getPathD } from './utils/trail-utils';
+import { SvgPathProps, Project, Dot } from '../types';
 
-interface Dot {
-  x: number;
-  y: number;
+interface FlexibleSvgPathProps extends SvgPathProps {
+  activationStart: number;
+  activationEnd: number;
+  containerRef: React.RefObject<HTMLDivElement>;
 }
 
-interface SvgPathProps {
-  width: number;
-  height: number;
-  dot1: Dot;
-  dot2: Dot;
-  pathType: 'curve' | 'zigzag' | 'wave' | 'straight';
-}
-
-const SvgPath: React.FC<SvgPathProps> = ({
+const SvgPath: React.FC<FlexibleSvgPathProps> = ({
   width,
   height,
   dot1,
   dot2,
-  pathType
+  pathType,
+  corner,
+  activationStart,
+  activationEnd,
+  id,
+  containerRef,
 }) => {
-  const [trailLength, setTrailLength] = useState(0);
+  const pathColor = 'invisible';
+  const followPathColor = 'orange';
+  const pathWidth = 2;
+  const [followLength, setFollowLength] = useState(0);
+  const [debugInfo, setDebugInfo] = useState({ scrollPercentage: 0, isActive: false });
   const pathRef = useRef<SVGPathElement>(null);
 
-  // Default values
-  const pathColor = 'blue';
-  const pathWidth = 2;
-  const trailColor = 'orange';
-
-  const pathD = getPathD(pathType, dot1, dot2, width, height);
+  const pathD = getPathD(pathType, dot1, dot2, corner);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (pathRef.current) {
-        const scrollPercentage = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+      if (pathRef.current && containerRef.current) {
         const pathLength = pathRef.current.getTotalLength();
-        setTrailLength(pathLength * scrollPercentage);
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Calculate the scroll percentage based on the container's position and height
+        const containerTop = containerRect.top + scrollTop;
+        const containerBottom = containerTop + containerRect.height;
+        const viewportBottom = scrollTop + windowHeight;
+        
+        // This allows scrollPercentage to go beyond 1
+        const scrollPercentage = (viewportBottom - containerTop) / containerRect.height;
+        
+        let newFollowLength = 0;
+        let isActive = false;
+
+        // Calculate progress without clamping
+        const progress = (scrollPercentage - activationStart) / (activationEnd - activationStart);
+        newFollowLength = Math.max(0, Math.min(pathLength, pathLength * progress));
+        isActive = progress > 0 && progress < 1;
+
+        setFollowLength(newFollowLength);
+        setDebugInfo({ scrollPercentage, isActive });
       }
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Call once to set initial state
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [activationStart, activationEnd, containerRef]);
 
   return (
-    <svg className="absolute inset-0" width={width} height={height}>
+    <svg
+      className="absolute inset-0 pointer-events-none"
+      width={width}
+      height={height}
+      style= {{
+        zIndex:-1000
+      }} // Apply the style here
+    >
       <path
         ref={pathRef}
         d={pathD}
@@ -56,9 +82,9 @@ const SvgPath: React.FC<SvgPathProps> = ({
       <path
         d={pathD}
         fill="none"
-        stroke={trailColor}
+        stroke={followPathColor}
         strokeWidth={pathWidth}
-        strokeDasharray={`${trailLength} ${Number.MAX_VALUE}`}
+        strokeDasharray={`${followLength} ${Number.MAX_VALUE}`}
       />
     </svg>
   );
