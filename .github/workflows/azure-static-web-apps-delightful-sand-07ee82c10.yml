@@ -24,9 +24,19 @@ jobs:
         with:
           node-version: '20.9.0'
       - name: Install npm 10.8.1
-        run: npm install -g npm@10.8.1
+        run: |
+          npm install -g npm@10.8.1
+          npm --version
+          echo "$(npm config get prefix)/bin" >> $GITHUB_PATH
+      - name: Verify npm version
+        run: |
+          npm --version
+          if [[ $(npm --version) != "10.8.1" ]]; then
+            echo "npm version is not 10.8.1"
+            exit 1
+          fi
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Unset extraheader
         run: git config --global --unset-all http.https://github.com/.extraheader || true
       - name: Set CI to false to prevent treating warnings as errors
@@ -38,14 +48,11 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_DELIGHTFUL_SAND_07EE82C10 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "/" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "dist/portfolio-upwurok" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          app_location: "/"
+          api_location: ""
+          output_location: "dist/portfolio-upwurok"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
