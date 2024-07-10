@@ -69,6 +69,6 @@
     "includedScripts": []
   },
   "engines": {
-    "node": "22.3.0"
+    "node": "20.9.0"
   }
 }
