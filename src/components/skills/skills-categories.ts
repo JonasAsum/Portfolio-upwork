@@ -14,6 +14,8 @@ export interface Skill {
         { name: "React" },
         { name: "TailwindCSS" },
         { name: "JavaScript" },
+        { name: "TypeScript" },
+        { name: "Next.js" },
       ]
     },
     {
@@ -22,14 +24,17 @@ export interface Skill {
         { name: "Node.js" },
         { name: "Express" },
         { name: "MongoDB" },
+        { name: "Python (Django/Flask)" },
       ]
     },
     {
-      title: "Tools",
+      title: "DevOps & Tools",
       skills: [
         { name: "Git" },
-        { name: "Docker" },
-        { name: "VS Code" },
+        { name: "Azure & Cloud" },
+        { name: "Postman" },
+        { name: "SEO Best Practices" },
+        { name: "Performance Optimization" },
       ]
     }
   ];

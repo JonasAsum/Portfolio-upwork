@@ -2,12 +2,14 @@ import React, { useEffect, useState, forwardRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import emailjs from '@emailjs/browser';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormItem, FormLabel, FormControl, FormField } from '@/components/ui/form';
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
+import {config} from './config'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -23,6 +25,7 @@ interface ContactFormProps {
 
 const ContactForm = forwardRef<HTMLDivElement, ContactFormProps>(({ onOverlayClick }, ref) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(schema),
@@ -37,6 +40,18 @@ const ContactForm = forwardRef<HTMLDivElement, ContactFormProps>(({ onOverlayCli
 
   const watchedFields = watch();
 
+
+
+  useEffect(() => {
+    // Preload the background image
+    const img = new Image();
+    img.src = "/images/bg-contact.jpg";
+    img.onload = () => setImageLoaded(true);
+
+    // Initialize EmailJS
+    emailjs.init(config.emailjs.publicKey);
+  }, []);
+
   useEffect(() => {
     if (!isSubmitted) {
       localStorage.setItem('contactForm_name', watchedFields.name || '');
@@ -45,26 +60,43 @@ const ContactForm = forwardRef<HTMLDivElement, ContactFormProps>(({ onOverlayCli
     }
   }, [watchedFields, isSubmitted]);
 
-  const onSubmit = (data: ContactFormValues) => {
-    console.log(data);
-    toast.success(
-      `Email sent successfully!`,
-      {
-        description: `Thank you, ${data.name}. I'll respond to ${data.email} soon.`,
-        duration: 5000,
-      }
-    );
-    setIsSubmitted(true);
-    localStorage.removeItem('contactForm_name');
-    localStorage.removeItem('contactForm_email');
-    localStorage.removeItem('contactForm_message');
+  const onSubmit = async (data: ContactFormValues) => {
+    console.log('test',config.emailjs.publicKey)
+    try {
+      const result = await emailjs.send(
+        config.emailjs.serviceId,
+        config.emailjs.templateId,
+        {
+          from_name: data.name,
+          from_email: data.email,
+          message: data.message,
+        }
+      );
 
-    reset({
-      name: '',
-      email: '',
-      message: '',
-    });
+      console.log(result);
+      toast.success(
+        `Email sent successfully!`,
+        {
+          description: `Thank you, ${data.name}. I'll respond to ${data.email} soon.`,
+          duration: 5000,
+        }
+      );
+      setIsSubmitted(true);
+      localStorage.removeItem('contactForm_name');
+      localStorage.removeItem('contactForm_email');
+      localStorage.removeItem('contactForm_message');
+
+      reset({
+        name: '',
+        email: '',
+        message: '',
+      });
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast.error('Failed to send email. Please try again later.');
+    }
   };
+
 
   return (
     <div 
@@ -73,14 +105,9 @@ const ContactForm = forwardRef<HTMLDivElement, ContactFormProps>(({ onOverlayCli
       onClick={onOverlayClick}
     >
       <div 
-        className="w-full max-w-screen-sm bg-blue-200 p-8 border rounded-3xl"
-        style={{
-          backgroundImage: 'url("/images/bg-contact.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-        onClick={(e) => e.stopPropagation()} // Prevent clicks on the form from triggering the overlay click
+        className={`w-full max-w-screen-sm bg-blue-200 p-8 border rounded-3xl ${imageLoaded ? 'bg-cover bg-center bg-no-repeat' : ''}`}
+        style={imageLoaded ? { backgroundImage: 'url("/images/bg-contact.jpg")' } : {}}
+        onClick={(e) => e.stopPropagation()}
       >
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

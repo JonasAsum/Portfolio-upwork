@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
+import Navbar from '../components/navbar'; // Make sure this path is correct
 import HeroSection from '../components/hero/hero-main';
 import AboutMeSection from '@/components/about-me/about-me-main';
 import SkillsSection from '@/components/skills/skills-main';
@@ -16,9 +17,10 @@ function App() {
 
   return (
     <div className="w-full overflow-hidden">
+      <Navbar />
       <HeroSection />
       <div 
-        className='relative min-h-screen ' 
+        className='relative min-h-screen' // Added pt-16 for navbar spacing
         id='container' 
         ref={containerRef}
         style={{
@@ -37,18 +39,17 @@ function App() {
             backgroundRepeat: 'no-repeat',
             backgroundAttachment: 'fixed',
             mixBlendMode: 'normal',
-            opacity: 0.8, // Adjust this value if needed
+            opacity: 0.8,
           }}
         ></div>
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div ref={sectionRef} className='max-w-screen-xl mx-auto relative px-4 sm:px-6 lg:px-8 text-white'>
-            <AboutMeSection />
-            <SkillsSection  />
-            <ProjectsSection />
-            <ContactSection  scrollPercentage={scrollPercentage} />
+            <section id="about" className="min-h-screen"><AboutMeSection /></section>
+            <section id="skills" className="min-h-screen"><SkillsSection /></section>
+            <section id="projects" className="min-h-screen"><ProjectsSection /></section>
+            <section id="contact" className="min-h-screen"><ContactSection scrollPercentage={scrollPercentage} /></section>
           </div>
           
-          {/* SVG paths rendered outside sectionRef but inside containerRef */}
           {renderedPaths.map((pathProps) => (
             <MemoizedSvgPath 
               key={pathProps.id} 
@@ -57,7 +58,6 @@ function App() {
             />
           ))}
 
-          {/* Rendered dots */}
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             {dotElements}
           </div>

@@ -55,4 +55,9 @@ export default defineConfig({
       provider: 'v8',
     },
   },
+
+  // Add this section to handle environment variables
+  define: {
+    'process.env': {}
+  },
 });

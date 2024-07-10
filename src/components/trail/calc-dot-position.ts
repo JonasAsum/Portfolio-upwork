@@ -2,7 +2,7 @@ import { Dot } from '../types';
 
 export const calculateDotPosition = (dot: Dot, elementRect: DOMRect, containerRect: DOMRect) => {
   let x = elementRect.left - containerRect.left;
-  let y = elementRect.top - containerRect.top;
+  let y = elementRect.top - containerRect.top ;
 
   switch (dot.position) {
     case 'topCenter':

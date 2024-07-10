@@ -162,19 +162,20 @@ const renderedPaths = useMemo(() => {
 }, [sectionSize, dotPositions, scrollPercentage]);
 
 
-  const dotElements = useMemo(() => {
-    return renderedDots.map(({ id, position }) => (
-      <div
-        key={id}
-        className="absolute w-2 h-2 rounded-full"
-        style={{ 
-          transform: `translate(${position.x}px, ${position.y}px)`,
-          willChange: 'transform'
-        }}
-      />
-    ));
-  }, [renderedDots]);
-
+const dotElements = useMemo(() => {
+  return renderedDots.map(({ id, position }) => (
+    <div
+      key={id}
+      className="absolutew-2 h-2 rounded-full"
+      style={{ 
+        top: position.y,
+        left: position.x,
+        transform: 'translate(-50%, -50%)',
+        willChange: 'transform'
+      }}
+    />
+  ));
+}, [renderedDots]);
   return {
     dotElements,
     renderedPaths,

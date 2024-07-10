@@ -6,7 +6,7 @@ export const aboutMeDots: Dot[] = [
     id: 'dot-about-me-title-1',
     elementId: 'about-me-title',
     position: 'topLeft',
-    offset: { x: 60, y: 5 }
+    offset: { x: 60, y: 0 }
   },
   {
     id: 'dot-about-me-content-2',
